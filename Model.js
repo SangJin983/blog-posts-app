@@ -16,9 +16,9 @@ export const generatePostModelUtils = () => {
 
   const subscribe = (listener) => {
     eventEmitter.on("change", listener);
-    // return (listener) => {
-    //   eventEmitter.off("change", listener);
-    // }
+    return (listener) => {
+      eventEmitter.off("change", listener);
+    }
   };
 
   return {

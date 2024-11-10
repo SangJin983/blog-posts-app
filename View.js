@@ -1,3 +1,5 @@
+import { EventEmitter } from "./utils/eventEmitter";
+
 export const PostView = () => {
   const postContainerElement = document.querySelector(".post-container");
 
@@ -46,6 +48,7 @@ export const PostView = () => {
 };
 
 export const PaginationView = () => {
+  const eventEmitter = new EventEmitter();
   const paginationContainerElement = document.querySelector(
     ".pagination-container"
   );
@@ -58,6 +61,14 @@ export const PaginationView = () => {
     return pageButtonElement;
   };
 
+  // 페이지네이션 버튼 클릭시, 페이지넘버 변경요구를 알림
+  paginationContainerElement.addEventListener("click", (event) => {
+    if (event.target.classList.contains("pagination-button")) {
+      const pageNumber = Number(event.target.textContent);
+      eventEmitter.emit("change", pageNumber);
+    }
+  });
+
   const render = (totalPages) => {
     paginationContainerElement.innerHTML = "";
     for (let i = 1; i <= totalPages; i += 1) {
@@ -66,7 +77,15 @@ export const PaginationView = () => {
     }
   };
 
+  const subscribe = (listener) => {
+    eventEmitter.on("change", listener);
+    return (listener) => {
+      eventEmitter.off("change", listener);
+    };
+  };
+
   return {
     render,
+    subscribe,
   };
 };

@@ -18,39 +18,23 @@ export const Controller = () => {
       postView.render(paginatedPosts);
     };
 
+    const renderPagination = (posts) => {
+      const totalPages = Math.ceil(posts.length / POST_PER_PAGE);
+
+      paginationView.render(totalPages);
+    };
+
+    const changeCurrentPage = (pageNumber) => {
+      currentPage = pageNumber;
+      postModelUtils.fetchPosts()
+    }
+
     postModelUtils.subscribe(renderPost);
+    postModelUtils.subscribe(renderPagination);
+    paginationView.subscribe(changeCurrentPage);
+
     await postModelUtils.fetchPosts();
-    // renderPost();
-    // renderPagination();
-    // addPaginationEventListener();
   };
-
-  const renderPost = () => {
-    const posts = postModel();
-    const startIndex = (currentPage - 1) * POST_PER_PAGE;
-    const endIndex = startIndex + POST_PER_PAGE;
-    const paginatedPosts = posts.slice(startIndex, endIndex);
-
-    postView.render(paginatedPosts);
-  };
-
-  // const renderPagination = () => {
-  //   const posts = postModel();
-  //   const totalPages = Math.ceil(posts.length / POST_PER_PAGE);
-
-  //   paginationView.render(totalPages);
-  // };
-
-  // const addPaginationEventListener = () => {
-  //   const paginationContainerElement = document.querySelector(
-  //     ".pagination-container"
-  //   );
-
-  //   paginationContainerElement.addEventListener("click", (event) => {
-  //     currentPage = Number(event.target.textContent);
-  //     renderPost();
-  //   });
-  // };
 
   return {
     initApp,
