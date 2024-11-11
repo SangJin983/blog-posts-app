@@ -7,33 +7,30 @@ export const Controller = () => {
   const paginationView = PaginationView();
 
   const POST_PER_PAGE = 5;
-  let currentPage = 1;
 
   const initApp = async () => {
     const renderPost = (posts) => {
-      const startIndex = (currentPage - 1) * POST_PER_PAGE;
-      const endIndex = startIndex + POST_PER_PAGE;
-      const paginatedPosts = posts.slice(startIndex, endIndex);
-
-      postView.render(paginatedPosts);
+      postView.render(posts);
     };
 
-    const renderPagination = (posts) => {
-      const totalPages = Math.ceil(posts.length / POST_PER_PAGE);
+    const renderPagination = () => {
+      const totalPages = 20;
 
       paginationView.render(totalPages);
     };
 
     const changeCurrentPage = (pageNumber) => {
-      currentPage = pageNumber;
-      postModelUtils.fetchPosts()
-    }
+      const startIndex = (pageNumber - 1) * POST_PER_PAGE + 1;
+      const endIndex = startIndex + POST_PER_PAGE;
+
+      postModelUtils.fetchPosts(startIndex, endIndex);
+    };
 
     postModelUtils.subscribe(renderPost);
     postModelUtils.subscribe(renderPagination);
     paginationView.subscribe(changeCurrentPage);
 
-    await postModelUtils.fetchPosts();
+    await postModelUtils.fetchPosts(1, 5);
   };
 
   return {

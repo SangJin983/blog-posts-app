@@ -1,24 +1,33 @@
-import { deepClone } from "./utils/deepClone";
 import { EventEmitter } from "./utils/eventEmitter";
+import { applyFunctionInRange } from "./utils/applyFunctionInRange"
 
 export const generatePostModelUtils = () => {
   const eventEmitter = new EventEmitter();
   const POSTS_URL = "https://jsonplaceholder.typicode.com/posts";
 
-  let posts = [];
+  const generateIdrangeQuery = (start, end) => {
+    const ids = [];
+    
+    applyFunctionInRange(start, end, (index) => {
+      ids.push(`id=${index}`)
+    })
 
-  const fetchPosts = async () => {
-    const response = await fetch(POSTS_URL);
+    return ids.join("&");
+  };
+
+  const fetchPosts = async (start, end) => {
+    const idQuery = generateIdrangeQuery(start, end);
+    const response = await fetch(POSTS_URL + "?" + idQuery);
     const jsonData = await response.json();
-    posts = deepClone(jsonData);
-    eventEmitter.emit("change", posts);
+
+    eventEmitter.emit("change", jsonData);
   };
 
   const subscribe = (listener) => {
     eventEmitter.on("change", listener);
     return (listener) => {
       eventEmitter.off("change", listener);
-    }
+    };
   };
 
   return {
