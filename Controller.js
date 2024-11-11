@@ -21,7 +21,7 @@ export const Controller = () => {
 
     const changeCurrentPage = (pageNumber) => {
       const startIndex = (pageNumber - 1) * POST_PER_PAGE + 1;
-      const endIndex = startIndex + POST_PER_PAGE;
+      const endIndex = startIndex + POST_PER_PAGE - 1;
 
       postModelUtils.fetchPosts(startIndex, endIndex);
     };
