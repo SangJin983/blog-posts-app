@@ -7,30 +7,50 @@ export const Controller = () => {
   const paginationView = PaginationView();
 
   const POST_PER_PAGE = 5;
+  const PAGINATION_RANGE = 3;
+
+  const findEndPage = async (pageNumber) => {
+    let endPage = pageNumber + PAGINATION_RANGE;
+
+    while (endPage > 0) {
+      const endPageFistIndex = (endPage - 1) * POST_PER_PAGE + 1;
+      const isVaild = await postModelUtils.isValidId(endPageFistIndex);
+
+      if (isVaild) {
+        return endPage;
+      }
+
+      endPage -= 1;
+    }
+
+    return endPage;
+  };
+
+  const renderPagination = async (pageNumber) => {
+    const startPage = Math.max(1, pageNumber - PAGINATION_RANGE);
+    const endPage = await findEndPage(pageNumber);
+
+    paginationView.render(startPage, endPage);
+  };
 
   const initApp = async () => {
     const renderPost = (posts) => {
       postView.render(posts);
     };
 
-    const renderPagination = () => {
-      const totalPages = 20;
-
-      paginationView.render(totalPages);
-    };
-
     const changeCurrentPage = (pageNumber) => {
       const startIndex = (pageNumber - 1) * POST_PER_PAGE + 1;
       const endIndex = startIndex + POST_PER_PAGE - 1;
 
+      renderPagination(pageNumber);
       postModelUtils.fetchPosts(startIndex, endIndex);
     };
 
     postModelUtils.subscribe(renderPost);
-    postModelUtils.subscribe(renderPagination);
     paginationView.subscribe(changeCurrentPage);
 
     await postModelUtils.fetchPosts(1, 5);
+    renderPagination(1);
   };
 
   return {

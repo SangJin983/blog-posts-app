@@ -1,5 +1,5 @@
 import { EventEmitter } from "./utils/eventEmitter";
-import { applyFunctionInRange } from "./utils/applyFunctionInRange"
+import { applyFunctionInRange } from "./utils/applyFunctionInRange";
 
 export const generatePostModelUtils = () => {
   const eventEmitter = new EventEmitter();
@@ -7,10 +7,10 @@ export const generatePostModelUtils = () => {
 
   const generateIdrangeQuery = (start, end) => {
     const ids = [];
-    
+
     applyFunctionInRange(start, end, (index) => {
-      ids.push(`id=${index}`)
-    })
+      ids.push(`id=${index}`);
+    });
 
     return ids.join("&");
   };
@@ -23,6 +23,14 @@ export const generatePostModelUtils = () => {
     eventEmitter.emit("change", jsonData);
   };
 
+  const isValidId = async (id) => {
+    const idQuery = generateIdrangeQuery(id, id);
+    const response = await fetch(POSTS_URL + "?" + idQuery);
+    const jsonData = await response.json();
+
+    return jsonData.length > 0;
+  };
+
   const subscribe = (listener) => {
     eventEmitter.on("change", listener);
     return (listener) => {
@@ -32,6 +40,7 @@ export const generatePostModelUtils = () => {
 
   return {
     fetchPosts,
+    isValidId,
     subscribe,
   };
 };

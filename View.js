@@ -69,9 +69,9 @@ export const PaginationView = () => {
     }
   });
 
-  const render = (totalPages) => {
+  const render = (start, end) => {
     paginationContainerElement.innerHTML = "";
-    for (let i = 1; i <= totalPages; i += 1) {
+    for (let i = start; i <= end; i += 1) {
       const pageButton = createElement(i);
       paginationContainerElement.append(pageButton);
     }
