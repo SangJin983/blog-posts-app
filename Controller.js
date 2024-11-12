@@ -1,10 +1,11 @@
-import { generatePostModelUtils } from "./Model";
+import { generatePostModelUtils, CurrentPageState } from "./Model";
 import { PostView, PaginationView } from "./View";
 
 export const Controller = () => {
   const postModelUtils = generatePostModelUtils();
   const postView = PostView();
   const paginationView = PaginationView();
+  const currentPageState = new CurrentPageState();
 
   const POST_PER_PAGE = 5;
   const PAGINATION_RANGE = 3;
@@ -26,28 +27,30 @@ export const Controller = () => {
     return endPage;
   };
 
-  const renderPagination = async (pageNumber) => {
-    const startPage = Math.max(1, pageNumber - PAGINATION_RANGE);
-    const endPage = await findEndPage(pageNumber);
-
-    paginationView.render(startPage, endPage);
-  };
-
   const initApp = async () => {
     const renderPost = (posts) => {
       postView.render(posts);
     };
 
-    const changeCurrentPage = (pageNumber) => {
+    const renderPagination = async (pageNumber) => {
+      const startPage = Math.max(1, pageNumber - PAGINATION_RANGE);
+      const endPage = await findEndPage(pageNumber);
+
+      paginationView.render(startPage, endPage);
+    };
+
+    paginationView.subscribe((pageNumber) => {
+      currentPageState.setPage(pageNumber);
+    });
+
+    currentPageState.subscribe((pageNumber) => {
       const startIndex = (pageNumber - 1) * POST_PER_PAGE + 1;
       const endIndex = startIndex + POST_PER_PAGE - 1;
 
-      renderPagination(pageNumber);
       postModelUtils.fetchPosts(startIndex, endIndex);
-    };
+    });
 
     postModelUtils.subscribe(renderPost);
-    paginationView.subscribe(changeCurrentPage);
 
     await postModelUtils.fetchPosts(1, 5);
     renderPagination(1);

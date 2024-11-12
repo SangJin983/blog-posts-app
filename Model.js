@@ -44,3 +44,20 @@ export const generatePostModelUtils = () => {
     subscribe,
   };
 };
+
+export class CurrentPageState {
+  #currentPage;
+  #eventEmitter = new EventEmitter();
+
+  setPage(pageNumber) {
+    this.#currentPage = pageNumber;
+    this.#eventEmitter.emit("change", this.#currentPage);
+  }
+
+  subscribe(listener) {
+    this.#eventEmitter.on("change", listener);
+    return (listener) => {
+      this.#eventEmitter.off("change", listener);
+    };
+  }
+}
