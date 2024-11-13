@@ -1,31 +1,21 @@
 import { EventEmitter } from "./utils/eventEmitter";
-import { applyFunctionInRange } from "./utils/applyFunctionInRange";
+import { generateQueryParamWithRange } from "./utils/generateQueryParamWithRange";
 
 export class PostModel {
   #POSTS_URL = "https://jsonplaceholder.typicode.com/posts";
   #eventEmitter = new EventEmitter();
 
-  #generateIdrangeQuery(start, end) {
-    const ids = [];
-
-    applyFunctionInRange(start, end, (index) => {
-      ids.push(`id=${index}`);
-    });
-
-    return ids.join("&");
-  }
-
   async fetchPosts(start, end) {
-    const idQuery = this.#generateIdrangeQuery(start, end);
-    const response = await fetch(this.#POSTS_URL + "?" + idQuery);
+    const queryParam = generateQueryParamWithRange(start, end)
+    const response = await fetch(this.#POSTS_URL + "?" + queryParam);
     const jsonData = await response.json();
 
     this.#eventEmitter.emit("change", jsonData);
   }
 
   async isValidId(id) {
-    const idQuery = this.#generateIdrangeQuery(id, id);
-    const response = await fetch(this.#POSTS_URL + "?" + idQuery);
+    const queryParam = generateQueryParamWithRange(id, id + 1);
+    const response = await fetch(this.#POSTS_URL + "?" + queryParam);
     const jsonData = await response.json();
 
     return jsonData.length > 0;

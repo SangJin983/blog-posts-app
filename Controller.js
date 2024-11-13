@@ -14,8 +14,8 @@ export const Controller = () => {
     let endPage = pageNumber + PAGINATION_RANGE;
 
     while (endPage > 0) {
-      const endPageFistIndex = (endPage - 1) * POST_PER_PAGE + 1;
-      const isVaild = await postModel.isValidId(endPageFistIndex);
+      const endPageFirstIndex = (endPage - 1) * POST_PER_PAGE + 1;
+      const isVaild = await postModel.isValidId(endPageFirstIndex);
 
       if (isVaild) {
         return endPage;
@@ -41,7 +41,7 @@ export const Controller = () => {
 
     currentPageState.subscribe((pageNumber) => {
       const startIndex = (pageNumber - 1) * POST_PER_PAGE + 1;
-      const endIndex = startIndex + POST_PER_PAGE - 1;
+      const endIndex = startIndex + POST_PER_PAGE;
 
       postModel.fetchPosts(startIndex, endIndex);
     });
@@ -50,7 +50,7 @@ export const Controller = () => {
       postView.render(posts);
     });
 
-    await postModel.fetchPosts(1, 5);
+    await postModel.fetchPosts(1, 6);
     renderPagination(1);
   };
 
