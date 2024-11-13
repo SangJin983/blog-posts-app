@@ -1,4 +1,5 @@
 import { EventEmitter } from "./utils/eventEmitter";
+import { applyFunctionInRange } from "./utils/applyFunctionInRange";
 
 export const PostView = () => {
   const postContainerElement = document.querySelector(".post-container");
@@ -71,10 +72,10 @@ export const PaginationView = () => {
 
   const render = (start, end) => {
     paginationContainerElement.innerHTML = "";
-    for (let i = start; i <= end; i += 1) {
-      const pageButton = createElement(i);
+    applyFunctionInRange(start, end, (index) => {
+      const pageButton = createElement(index);
       paginationContainerElement.append(pageButton);
-    }
+    });
   };
 
   const subscribe = (listener) => {

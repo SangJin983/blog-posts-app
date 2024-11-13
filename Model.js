@@ -1,11 +1,11 @@
 import { EventEmitter } from "./utils/eventEmitter";
 import { applyFunctionInRange } from "./utils/applyFunctionInRange";
 
-export const generatePostModelUtils = () => {
-  const eventEmitter = new EventEmitter();
-  const POSTS_URL = "https://jsonplaceholder.typicode.com/posts";
+export class PostModel {
+  #POSTS_URL = "https://jsonplaceholder.typicode.com/posts";
+  #eventEmitter = new EventEmitter();
 
-  const generateIdrangeQuery = (start, end) => {
+  #generateIdrangeQuery(start, end) {
     const ids = [];
 
     applyFunctionInRange(start, end, (index) => {
@@ -13,37 +13,31 @@ export const generatePostModelUtils = () => {
     });
 
     return ids.join("&");
-  };
+  }
 
-  const fetchPosts = async (start, end) => {
-    const idQuery = generateIdrangeQuery(start, end);
-    const response = await fetch(POSTS_URL + "?" + idQuery);
+  async fetchPosts(start, end) {
+    const idQuery = this.#generateIdrangeQuery(start, end);
+    const response = await fetch(this.#POSTS_URL + "?" + idQuery);
     const jsonData = await response.json();
 
-    eventEmitter.emit("change", jsonData);
-  };
+    this.#eventEmitter.emit("change", jsonData);
+  }
 
-  const isValidId = async (id) => {
-    const idQuery = generateIdrangeQuery(id, id);
-    const response = await fetch(POSTS_URL + "?" + idQuery);
+  async isValidId(id) {
+    const idQuery = this.#generateIdrangeQuery(id, id);
+    const response = await fetch(this.#POSTS_URL + "?" + idQuery);
     const jsonData = await response.json();
 
     return jsonData.length > 0;
-  };
+  }
 
-  const subscribe = (listener) => {
-    eventEmitter.on("change", listener);
+  subscribe(listener) {
+    this.#eventEmitter.on("change", listener);
     return (listener) => {
-      eventEmitter.off("change", listener);
+      this.#eventEmitter.off("change", listener);
     };
-  };
-
-  return {
-    fetchPosts,
-    isValidId,
-    subscribe,
-  };
-};
+  }
+}
 
 export class CurrentPageState {
   #currentPage;
