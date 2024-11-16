@@ -11,26 +11,29 @@ export const Controller = () => {
   const PAGINATION_RANGE = 3;
 
   const findEndPage = async (pageNumber) => {
-    let endPage = pageNumber + PAGINATION_RANGE;
+    // 페이지넘버에 따라, 페이지네이션의 마지막 페이지를 초기화
+    const endPage = pageNumber + PAGINATION_RANGE;
 
-    while (endPage > 0) {
-      const endPageFirstIndex = (endPage - 1) * POST_PER_PAGE + 1;
-      const isVaild = await postModel.isValidId(endPageFirstIndex);
-
-      if (isVaild) {
-        return endPage;
-      }
-
-      endPage -= 1;
+    if (endPage < 2) {
+      return 2;
     }
 
-    return endPage;
+    // 초기화한 마지막 페이지의 첫번째 post가 유효한지 확인
+    const endPageFirstIndex = (endPage - 1) * POST_PER_PAGE + 1;
+    const isVaild = await postModel.isValidId(endPageFirstIndex);
+
+    if (isVaild) {
+      return endPage;
+    }
+
+    // 초기화한 마지막 페이지가 유효하지 않을 경우, 페이지넘버를 1 줄여서 재귀탐색
+    return findEndPage(pageNumber - 1);
   };
 
   const initApp = async () => {
     const renderPagination = async (pageNumber) => {
       const startPage = Math.max(1, pageNumber - PAGINATION_RANGE);
-      const endPage = await findEndPage(pageNumber);
+      const endPage = (await findEndPage(pageNumber)) + 1;
 
       paginationView.render(startPage, endPage);
     };
