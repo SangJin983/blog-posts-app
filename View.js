@@ -1,5 +1,4 @@
 import { EventEmitter } from "./utils/eventEmitter";
-import { range } from "./utils/range";
 
 export const PostView = () => {
   const postContainerElement = document.querySelector(".post-container");
@@ -70,12 +69,12 @@ export const PaginationView = () => {
     }
   });
 
-  const render = (start, end) => {
+  const render = (pageRange) => {
     paginationContainerElement.innerHTML = "";
-    const pageButtons = range(start, end).map((index) => createElement(index));
-    pageButtons.forEach((pageButton) =>
-      paginationContainerElement.append(pageButton)
-    );
+    pageRange.forEach((index) => {
+      const pageButtons = createElement(index);
+      paginationContainerElement.append(pageButtons);
+    });
   };
 
   const subscribe = (listener) => {

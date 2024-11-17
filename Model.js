@@ -1,5 +1,6 @@
 import { EventEmitter } from "./utils/eventEmitter";
 import { generateQueryParamWithRange } from "./utils/generateQueryParamWithRange";
+import { range } from "./utils/range";
 
 export class PostModel {
   #POSTS_URL = "https://jsonplaceholder.typicode.com/posts";
@@ -36,6 +37,23 @@ export class CurrentPageState {
   setPage(pageNumber) {
     this.#currentPage = pageNumber;
     this.#eventEmitter.emit("change", this.#currentPage);
+  }
+
+  subscribe(listener) {
+    this.#eventEmitter.on("change", listener);
+    return (listener) => {
+      this.#eventEmitter.off("change", listener);
+    };
+  }
+}
+
+export class CurrentPaginationRange {
+  #currentPaginationRange;
+  #eventEmitter = new EventEmitter();
+
+  setRange(start, end) {
+    this.#currentPaginationRange = range(start, end);
+    this.#eventEmitter.emit("change", this.#currentPaginationRange);
   }
 
   subscribe(listener) {
