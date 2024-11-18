@@ -20,7 +20,7 @@ export class PostModel {
       if (response.status === "fulfilled") {
         return response.value.json();
       }
-      console.error("Fetch post error:", response.reason || response.message);
+      console.error("Fetch post error:", response.reason);
       return null;
     });
     // 모든 비동기 json()을 처리 후, 배열로 반환

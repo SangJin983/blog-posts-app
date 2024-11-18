@@ -15,12 +15,8 @@ describe("time out", () => {
       setTimeout(() => resolve("Success"), 150)
     );
 
-    // try {
-    //   await timeout(slowPromise, 100);
-    // } catch (error) {
-    //   expect(error.message).toBe("it's too late!");
-    // }
-
-    await expect(timeout(slowPromise, 100)).rejects.toThrow("it's too late!");
+    await expect(timeout(slowPromise, 100)).rejects.toEqual({
+      reason: "it's too late!",
+    });
   });
 });
