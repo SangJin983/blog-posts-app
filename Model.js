@@ -1,15 +1,17 @@
 import { EventEmitter } from "./utils/eventEmitter";
 import { generateQueryParamWithRange } from "./utils/generateQueryParamWithRange";
 import { range } from "./utils/range";
+import { timeout } from "./utils/timeout";
 
 export class PostModel {
   #POSTS_URL = "https://jsonplaceholder.typicode.com/posts";
+  #TIMEOUT_MS = 1000;
   #eventEmitter = new EventEmitter();
 
   async fetchPosts(start, end) {
     // 패치 요청을 시도할 Promise 객체를 생성
     const fetches = range(start, end).map((id) =>
-      fetch(this.#POSTS_URL + "/" + id)
+      timeout(fetch(this.#POSTS_URL + "/" + id), this.#TIMEOUT_MS)
     );
     // 패치 요청에 대한 응답을 기다림
     const responses = await Promise.allSettled(fetches);
@@ -18,7 +20,7 @@ export class PostModel {
       if (response.status === "fulfilled") {
         return response.value.json();
       }
-      console.error("Fetch post error:", response.reason);
+      console.error("Fetch post error:", response.reason || response.message);
       return null;
     });
     // 모든 비동기 json()을 처리 후, 배열로 반환
