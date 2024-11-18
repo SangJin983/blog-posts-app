@@ -47,13 +47,13 @@ export class CurrentPageState {
   }
 }
 
-export class CurrentPaginationRange {
-  #currentPaginationRange;
+export class CurrentPaginationState {
+  #currentPaginationState;
   #eventEmitter = new EventEmitter();
 
   setRange(start, end) {
-    this.#currentPaginationRange = range(start, end);
-    this.#eventEmitter.emit("change", this.#currentPaginationRange);
+    this.#currentPaginationState = range(start, end);
+    this.#eventEmitter.emit("change", this.#currentPaginationState);
   }
 
   subscribe(listener) {

@@ -1,4 +1,4 @@
-import { PostModel, CurrentPageState, CurrentPaginationRange } from "./Model";
+import { PostModel, CurrentPageState, CurrentPaginationState } from "./Model";
 import { PostView, PaginationView } from "./View";
 
 export const Controller = () => {
@@ -6,7 +6,7 @@ export const Controller = () => {
   const postView = PostView();
   const paginationView = PaginationView();
   const currentPageState = new CurrentPageState();
-  const currentPaginationRange = new CurrentPaginationRange();
+  const currentPaginationState = new CurrentPaginationState();
 
   const POST_PER_PAGE = 5;
   const PAGINATION_RANGE = 3;
@@ -41,23 +41,29 @@ export const Controller = () => {
     const updatePaginationRange = async (pageNumber) => {
       const startPage = Math.max(1, pageNumber - PAGINATION_RANGE);
       const endPage = (await findEndPage(pageNumber)) + 1;
-      currentPaginationRange.setRange(startPage, endPage);
+      currentPaginationState.setRange(startPage, endPage);
     };
 
     paginationView.subscribe((pageNumber) => {
       currentPageState.setPage(pageNumber);
     });
 
-    currentPageState.subscribe((pageNumber) => {
-      updatePosts(pageNumber);
-      updatePaginationRange(pageNumber);
+    currentPageState.subscribe(async (pageNumber) => {
+      try {
+        await Promise.all([
+          updatePosts(pageNumber),
+          updatePaginationRange(pageNumber),
+        ]);
+      } catch (error) {
+        console.error("Error updating posts or pagination range:", error);
+      }
     });
 
     postModel.subscribe((posts) => {
       postView.render(posts);
     });
 
-    currentPaginationRange.subscribe((pageRange) => {
+    currentPaginationState.subscribe((pageRange) => {
       paginationView.render(pageRange);
     });
 
