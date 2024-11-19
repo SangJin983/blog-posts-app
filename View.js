@@ -57,6 +57,7 @@ export const PaginationView = () => {
     const pageButtonElement = document.createElement("button");
     pageButtonElement.className = "pagination-button";
     pageButtonElement.textContent = index;
+    pageButtonElement.setAttribute("data-page", index);
 
     return pageButtonElement;
   };
@@ -77,6 +78,14 @@ export const PaginationView = () => {
     });
   };
 
+  const highlight = (currentpage) => {
+    const activeButtonElement = document.querySelector(
+      `.pagination-button[data-page="${currentpage}"]`
+    );
+
+    activeButtonElement.classList.add("active");
+  };
+
   const subscribe = (listener) => {
     eventEmitter.on("change", listener);
     return (listener) => {
@@ -86,6 +95,7 @@ export const PaginationView = () => {
 
   return {
     render,
+    highlight,
     subscribe,
   };
 };

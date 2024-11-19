@@ -57,6 +57,7 @@ export const Controller = () => {
       } catch (error) {
         console.error("Error updating posts or pagination range:", error);
       }
+      paginationView.highlight(pageNumber);
     });
 
     postModel.subscribe((posts) => {
