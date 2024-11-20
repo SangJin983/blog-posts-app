@@ -13,22 +13,27 @@ export class PostModel {
     const fetches = range(start, end).map((id) =>
       timeout(fetch(this.#POSTS_URL + "/" + id), this.#TIMEOUT_MS)
     );
-    // 패치 요청에 대한 응답을 기다림
-    const responses = await Promise.allSettled(fetches);
-    // 패치 요청 성공한 post에 대해 json() 변환을 시도할 Promise 객체를 생성
-    const jsonDatas = responses.map((response) => {
-      if (response.status === "fulfilled") {
-        return response.value.json();
-      }
-      console.error("Fetch post error:", response.reason);
-      return null;
-    });
-    // 모든 비동기 json()을 처리 후, 배열로 반환
-    const result = (await Promise.all(jsonDatas)).filter(
-      (data) => data !== null
-    );
 
-    this.#eventEmitter.emit("change", result);
+    try {
+      // 패치 요청을 기다린 후, 결과를 반환
+      const responses = await Promise.all(fetches);
+
+      responses.forEach((responses) => {
+        if (!responses.ok) {
+          throw new Error(`HTTP 응답 오류: ${responses.status}`);
+        }
+      });
+
+      // 패치 요청 성공한 post에 대해 json() 변환을 시도할 Promise 객체를 생성
+      const jsonDatas = responses.map((response) => response.json());
+      // 모든 비동기 json()을 처리 후, 배열로 반환
+      const result = await Promise.all(jsonDatas);
+      // 결과를 알림
+      this.#eventEmitter.emit("change", result);
+    } catch (error) {
+      console.error("Fetch post error:", error);
+      return;
+    }
   }
 
   async isValidId(id) {
