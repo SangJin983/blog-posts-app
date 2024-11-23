@@ -44,7 +44,7 @@ export const Controller = () => {
       currentPaginationState.setRange(startPage, endPage);
     };
 
-    paginationView.subscribe((pageNumber) => {
+    paginationView.onPageClick((pageNumber) => {
       currentPageState.setPage(pageNumber);
     });
 

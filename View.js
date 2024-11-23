@@ -65,7 +65,7 @@ export const PaginationView = () => {
   paginationContainerElement.addEventListener("click", (event) => {
     if (event.target.classList.contains("pagination-button")) {
       const pageNumber = Number(event.target.textContent);
-      eventEmitter.emit("change", pageNumber);
+      eventEmitter.emit("onPageClick", pageNumber);
     }
   });
 
@@ -77,15 +77,15 @@ export const PaginationView = () => {
     });
   };
 
-  const subscribe = (listener) => {
-    eventEmitter.on("change", listener);
+  const onPageClick = (listener) => {
+    eventEmitter.on("onPageClick", listener);
     return (listener) => {
-      eventEmitter.off("change", listener);
+      eventEmitter.off("onPageClick", listener);
     };
   };
 
   return {
     render,
-    subscribe,
+    onPageClick,
   };
 };
