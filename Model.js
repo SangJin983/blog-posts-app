@@ -16,17 +16,11 @@ export class PostModel {
     // 패치 요청에 대한 응답을 기다림
     const responses = await Promise.allSettled(fetches);
     // 패치 요청 성공한 post에 대해 json() 변환을 시도할 Promise 객체를 생성
-    const jsonDatas = responses.map((response) => {
-      if (response.status === "fulfilled") {
-        return response.value.json();
-      }
-      console.error("Fetch post error:", response.reason);
-      return null;
-    });
+    const jsonDatas = responses
+      .filter((response) => response.status === "fulfilled")
+      .map((response) => response.value.json());
     // 모든 비동기 json()을 처리 후, 배열로 반환
-    const result = (await Promise.all(jsonDatas)).filter(
-      (data) => data !== null
-    );
+    const result = await Promise.all(jsonDatas);
 
     this.#eventEmitter.emit("change", result);
   }
